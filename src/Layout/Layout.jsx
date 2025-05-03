@@ -1,6 +1,10 @@
-import Header from "./Header";
-import Footer from "./Footer";
+"use client";
+
+import React from "react";
 import ChatWindow from "../components/ChatWindow";
+import CategorySelector from "../components/CategorySelector";
+import ChatInput from "../components/ChatInput";
+
 const Layout = ({
   selectedCategory,
   setSelectedCategory,
@@ -10,26 +14,34 @@ const Layout = ({
   activeMode,
 }) => {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Header
-        className="bg-white shadow-sm p-4 sticky top-0 z-10"
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        setActiveMode={setActiveMode}
-      />
+    <div className="min-h-screen flex flex-col">
+      {/* Header */}
+      <header className="w-full border-b">
+        <div className=" mx-auto p-4">
+          <span className="text-2xl font-bold">🍳 ResepIn</span>
+        </div>
+      </header>
 
+      {/* Main Content */}
       <main className="flex-1 overflow-y-auto p-4">
-        <div className="max-w-6xl mx-auto h-full">
-          <ChatWindow messages={messages} />
+        <div className="  h-[calc(100vh-100px)] flex-col w-full   flex items-center justify-center ">
+          <div className="w-full ">
+            <ChatWindow messages={messages} />
+            <div className="flex max-w-3xl mx-auto flex-col justify-center items-center">
+              <ChatInput
+                onSend={onSend}
+                activeMode={activeMode}
+                selectedCategory={selectedCategory}
+              />
+              <CategorySelector
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+                setActiveMode={setActiveMode}
+              />
+            </div>
+          </div>
         </div>
       </main>
-
-      <Footer
-        className="sticky bottom-0 bg-white border-t z-10"
-        onSend={onSend}
-        activeMode={activeMode}
-        selectedCategory={selectedCategory}
-      />
     </div>
   );
 };
