@@ -25,11 +25,11 @@ const ChatInput = ({ onSend, activeMode, selectedCategory }) => {
   };
 
   return (
-    <div className="w-full mt-4">
+    <div className="w-full sm:mb-2 sm:mt-2">
       <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-2">
         <input
           type="text"
-          className="w-full bg-transparent h-3 px-3 py-2 focus:outline-none"
+          className="w-full bg-transparent h-3 px-3 py-2 focus:outline-none min-h-[40px]"
           placeholder={
             activeMode === "category_ingredients"
               ? "Masukkan bahannya"

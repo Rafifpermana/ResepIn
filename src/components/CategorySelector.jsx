@@ -41,7 +41,7 @@ const CategorySelector = ({
             <button
               key={category}
               onClick={() => handleCategoryClick(category)}
-              className={`px-3 py-2 rounded-full text-sm flex items-center gap-2 
+              className={`px-3 py-2 sm:mb-1 mb-3 rounded-full text-sm flex items-center gap-2 
                 transition-colors border ${
                   isSelected
                     ? "border-blue-500 bg-blue-50 text-blue-800"
