@@ -1,7 +1,7 @@
 import React from "react";
 import Message from "./Message";
 
-const ChatWindow = ({ messages }) => {
+const ChatWindow = ({ messages, onRetry }) => {
   return (
     <div className="w-full space-y-4 overflow-y-auto">
       {messages.length === 0 ? (
@@ -21,6 +21,7 @@ const ChatWindow = ({ messages }) => {
               sender={msg.sender}
               text={msg.text}
               data={msg.data}
+              onRetry={onRetry}
             />
           ))}
         </div>

@@ -40,75 +40,120 @@ const botAvatar = (
   </svg>
 );
 
-const Message = ({ sender, text, data }) => {
+const Message = ({ sender, text, data, onRetry }) => {
   return (
     <div
       className={`mb-6 flex ${
         sender === "user" ? "justify-end" : "justify-start"
       }`}
     >
-      {sender === "bot" && <div className="mr-3">{botAvatar}</div>}
+      {/* Avatar */}
+      {sender === "bot" && (
+        <div className="mr-3 hidden sm:block">{botAvatar}</div>
+      )}
+
+      {/* Message Bubble */}
       <div
-        className={`inline-block p-5 rounded-2xl max-w-3xl mb-6 shadow-lg ${
+        className={`inline-block p-4 rounded-2xl max-w-full sm:max-w-3xl mb-4 shadow-lg ${
           sender === "user"
             ? "bg-gradient-to-r from-blue-500 to-blue-700 text-white"
             : "bg-white border border-gray-200"
         }`}
-        style={{ wordBreak: "break-word" }}
       >
         {data ? (
-          <div className="space-y-5">
-            <p className="text-sm text-gray-500 mb-4">{text}</p>
+          <div className="space-y-4">
+            {/* Header - Mobile vs Desktop */}
+            <div className="bg-orange-50 p-3 sm:p-4 rounded-lg">
+              <h2 className="text-xl sm:text-2xl font-bold text-orange-600">
+                🍲 {text}
+              </h2>
+            </div>
 
             {data.recommendations?.map((recipe, index) => (
-              <div
-                key={index}
-                className="bg-gray-100 rounded-lg p-5 shadow-inner border border-gray-200"
-              >
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  {recipe.title}
-                </h3>
-
-                <div className="text-sm text-gray-600 mb-5">
-                  <span className="font-semibold">Kategori:</span>{" "}
-                  {recipe.category}
+              <div key={index} className="p-3 sm:p-4 border-b last:border-b-0">
+                {/* Recipe Header */}
+                <div className="flex items-start gap-2 sm:gap-3 mb-3 sm:mb-4">
+                  <div className="bg-yellow-100 p-1 sm:p-2 rounded-full">
+                    <span className="text-lg sm:text-xl">🍳</span>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+                      {recipe.title}
+                    </h3>
+                    <div className="badge bg-green-100 text-green-600 text-xs sm:text-sm mt-1">
+                      #{recipe.category}
+                    </div>
+                  </div>
                 </div>
 
-                <details className="group mb-5">
-                  <summary className="flex items-center cursor-pointer list-none font-semibold text-blue-600 hover:text-blue-700">
-                    Bahan-bahan ({recipe.ingredients.length})
-                    <span className="ml-2 transition-transform duration-300 group-open:rotate-180">
-                      ▼
-                    </span>
-                  </summary>
-                  <ul className="mt-4 pl-6 space-y-3 list-disc text-gray-700">
-                    {recipe.ingredients.map((ingredient, idx) => (
-                      <li key={idx}>{ingredient}</li>
-                    ))}
-                  </ul>
-                </details>
-
+                {/* Accordion - Responsive */}
                 <details className="group">
-                  <summary className="flex items-center cursor-pointer list-none font-semibold text-blue-600 hover:text-blue-700">
-                    Langkah-langkah ({recipe.steps.length})
-                    <span className="ml-2 transition-transform duration-300 group-open:rotate-180">
-                      ▼
-                    </span>
+                  <summary className="list-none cursor-pointer bg-gray-50 p-2 sm:p-3 rounded-lg">
+                    <div className="flex items-center justify-between text-sm sm:text-base">
+                      <div className="flex items-center">
+                        <span className="mr-2">📋</span>
+                        Bahan & Cara ({recipe.ingredients.length} bahan,{" "}
+                        {recipe.steps.length} langkah)
+                      </div>
+                      <span className="transform transition-transform group-open:rotate-180">
+                        ▼
+                      </span>
+                    </div>
                   </summary>
-                  <ol className="mt-4 pl-6 space-y-3 list-decimal text-gray-700">
-                    {recipe.steps.map((step, idx) => (
-                      <li key={idx}>{step}</li>
-                    ))}
-                  </ol>
+
+                  {/* Content - Responsive */}
+                  <div className="mt-2 sm:mt-3 space-y-3 sm:space-y-4">
+                    {/* Bahan */}
+                    <div className="bg-white p-2 sm:p-3 rounded border">
+                      <div className="flex items-center mb-1 sm:mb-2">
+                        <span className="text-green-500 mr-1 sm:mr-2">🛒</span>
+                        <h4 className="text-sm sm:text-base font-medium">
+                          Bahan-bahan:
+                        </h4>
+                      </div>
+                      <ul className="list-disc pl-4 sm:pl-6 text-xs sm:text-sm space-y-1 sm:space-y-2">
+                        {recipe.ingredients.map((ingredient, idx) => (
+                          <li key={idx}>{ingredient}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Langkah */}
+                    <div className="bg-white p-2 sm:p-3 rounded border">
+                      <div className="flex items-center mb-1 sm:mb-2">
+                        <span className="text-blue-500 mr-1 sm:mr-2">👩🍳</span>
+                        <h4 className="text-sm sm:text-base font-medium">
+                          Cara Membuat:
+                        </h4>
+                      </div>
+                      <ol className="list-decimal pl-4 sm:pl-6 text-xs sm:text-sm space-y-1 sm:space-y-2">
+                        {recipe.steps.map((step, idx) => (
+                          <li key={idx}>{step}</li>
+                        ))}
+                      </ol>
+                    </div>
+                  </div>
                 </details>
               </div>
             ))}
+
+            {/* Tombol - Responsive */}
+            <button
+              onClick={onRetry}
+              className="w-full sm:w-auto py-2 px-4 bg-orange-100 text-orange-600 rounded-full text-sm sm:text-base hover:bg-orange-200 transition-colors flex items-center justify-center gap-2"
+            >
+              <span>Lihat Resep Lainnya</span>
+              <span className="text-xl">🥘</span>
+            </button>
           </div>
         ) : (
-          <div className="whitespace-pre-wrap">{text}</div>
+          <div className="whitespace-pre-wrap text-sm sm:text-base">{text}</div>
         )}
       </div>
-      {sender === "user" && <div className="ml-3">{userAvatar}</div>}
+
+      {sender === "user" && (
+        <div className="ml-3 hidden sm:block">{userAvatar}</div>
+      )}
     </div>
   );
 };
