@@ -40,19 +40,21 @@ const botAvatar = (
   </svg>
 );
 
-const Message = ({ sender, text, data, onRetry }) => {
+const Message = ({ sender, text, data, pagination, onLoadMore, index }) => {
+  const currentPage = pagination?.current_page || 0;
+  const totalPages = pagination?.total_pages || 0;
+  const hasMore = currentPage + 1 < totalPages;
+
   return (
     <div
       className={`mb-6 flex ${
         sender === "user" ? "justify-end" : "justify-start"
       }`}
     >
-      {/* Avatar */}
       {sender === "bot" && (
         <div className="mr-3 hidden sm:block">{botAvatar}</div>
       )}
 
-      {/* Message Bubble */}
       <div
         className={`inline-block p-4 rounded-2xl max-w-full sm:max-w-3xl mb-4 shadow-lg ${
           sender === "user"
@@ -62,16 +64,14 @@ const Message = ({ sender, text, data, onRetry }) => {
       >
         {data ? (
           <div className="space-y-4">
-            {/* Header - Mobile vs Desktop */}
             <div className="bg-orange-50 p-3 sm:p-4 rounded-lg">
               <h2 className="text-xl sm:text-2xl font-bold text-orange-600">
                 🍲 {text}
               </h2>
             </div>
 
-            {data.recommendations?.map((recipe, index) => (
-              <div key={index} className="p-3 sm:p-4 border-b last:border-b-0">
-                {/* Recipe Header */}
+            {data.recommendations?.map((recipe, idx) => (
+              <div key={idx} className="p-3 sm:p-4 border-b last:border-b-0">
                 <div className="flex items-start gap-2 sm:gap-3 mb-3 sm:mb-4">
                   <div className="bg-yellow-100 p-1 sm:p-2 rounded-full">
                     <span className="text-lg sm:text-xl">🍳</span>
@@ -86,7 +86,6 @@ const Message = ({ sender, text, data, onRetry }) => {
                   </div>
                 </div>
 
-                {/* Accordion - Responsive */}
                 <details className="group">
                   <summary className="list-none cursor-pointer bg-gray-50 p-2 sm:p-3 rounded-lg">
                     <div className="flex items-center justify-between text-sm sm:text-base">
@@ -101,9 +100,7 @@ const Message = ({ sender, text, data, onRetry }) => {
                     </div>
                   </summary>
 
-                  {/* Content - Responsive */}
                   <div className="mt-2 sm:mt-3 space-y-3 sm:space-y-4">
-                    {/* Bahan */}
                     <div className="bg-white p-2 sm:p-3 rounded border">
                       <div className="flex items-center mb-1 sm:mb-2">
                         <span className="text-green-500 mr-1 sm:mr-2">🛒</span>
@@ -118,7 +115,6 @@ const Message = ({ sender, text, data, onRetry }) => {
                       </ul>
                     </div>
 
-                    {/* Langkah */}
                     <div className="bg-white p-2 sm:p-3 rounded border">
                       <div className="flex items-center mb-1 sm:mb-2">
                         <span className="text-blue-500 mr-1 sm:mr-2">👩🍳</span>
@@ -137,14 +133,15 @@ const Message = ({ sender, text, data, onRetry }) => {
               </div>
             ))}
 
-            {/* Tombol - Responsive */}
-            <button
-              onClick={onRetry}
-              className="w-full sm:w-auto py-2 px-4 bg-orange-100 text-orange-600 rounded-full text-sm sm:text-base hover:bg-orange-200 transition-colors flex items-center justify-center gap-2"
-            >
-              <span>Lihat Resep Lainnya</span>
-              <span className="text-xl">🥘</span>
-            </button>
+            {hasMore && (
+              <button
+                onClick={() => onLoadMore(index)}
+                className="w-full mt-4 py-2 px-4 bg-orange-100 hover:bg-orange-200 text-orange-600 rounded-full transition-colors flex items-center justify-center gap-2"
+              >
+                <span>Tampilkan Resep Lainnya (Halaman {currentPage + 1})</span>
+                <span className="text-xl">🥘</span>
+              </button>
+            )}
           </div>
         ) : (
           <div className="whitespace-pre-wrap text-sm sm:text-base">{text}</div>

@@ -1,7 +1,7 @@
 import React from "react";
 import Message from "./Message";
 
-const ChatWindow = ({ messages, onRetry }) => {
+const ChatWindow = ({ messages, onLoadMore }) => {
   return (
     <div className="w-full space-y-4 overflow-y-auto">
       {messages.length === 0 ? (
@@ -14,14 +14,16 @@ const ChatWindow = ({ messages, onRetry }) => {
           </span>
         </div>
       ) : (
-        <div className="space-y-4 p-4 sm:p-6   scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-gray-100">
+        <div className="space-y-4 p-4 sm:p-6 scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-gray-100">
           {messages.map((msg, index) => (
             <Message
               key={index}
+              index={index} // Tambahkan prop index
               sender={msg.sender}
               text={msg.text}
               data={msg.data}
-              onRetry={onRetry}
+              pagination={msg.pagination} // Tambahkan prop pagination
+              onLoadMore={onLoadMore} // Ganti onRetry ke onLoadMore
             />
           ))}
         </div>

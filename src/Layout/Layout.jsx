@@ -11,7 +11,7 @@ const Layout = ({
   messages,
   onSend,
   activeMode,
-  onRetry,
+  onLoadMore,
 }) => {
   const [isBurgerOpen, setIsBurgerOpen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
@@ -35,21 +35,21 @@ const Layout = ({
 
   return (
     <div className="h-screen ">
-      {/* Header */}
       <header className="w-full fixed top-0 inset-x-0 bg-white border-b">
         <div className="mx-auto p-4 text-2xl font-bold">
           <span className="text-blue-600">🍳 Resep</span>
           <span className="text-pink-500">In</span>
         </div>
       </header>
-      {/* Main Content */}
-      <main className="p-4 h-full flex justify-center   items-center ">
+
+      <main className="p-4 h-full flex justify-center items-center ">
         <div
           className={`w-full flex flex-col ${
             messages?.length > 0 ? "justify-between" : "justify-center"
           } pt-[50px] h-full`}
         >
-          <ChatWindow messages={messages} onRetry={onRetry} />
+          <ChatWindow messages={messages} onLoadMore={onLoadMore} />
+
           <div className="flex max-w-3xl mx-auto flex-col justify-center ">
             {!isMobileView && (
               <CategorySelector

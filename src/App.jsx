@@ -7,9 +7,9 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [activeMode, setActiveMode] = useState("general");
-  const [lastRequestParams, setLastRequestParams] = useState({});
 
-  const sendMessage = async (input, isRetry = false) => {
+  const sendMessage = async (input) => {
+    // Tambahkan pesan user
     const userMessage = {
       sender: "user",
       text:
@@ -21,8 +21,10 @@ function App() {
     setMessages((prev) => [...prev, userMessage]);
 
     try {
-      const body = {
+      // Siapkan parameter request
+      const requestBody = {
         mode: activeMode,
+        page: 0, // Selalu mulai dari halaman 0
         ...(activeMode === "category_ingredients" && {
           category: selectedCategory.toLowerCase(),
           ingredients: input,
@@ -30,64 +32,88 @@ function App() {
         ...(activeMode === "general" && { query: input }),
       };
 
-      if (!isRetry) setLastRequestParams(body);
-
-      const response = await fetch("http://127.0.0.1:5000/recommend", {
+      // Kirim request ke backend
+      const response = await fetch("http://localhost:5000/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...body, top_n: 5 }),
+        body: JSON.stringify({ ...requestBody, top_n: 5 }),
       });
 
-      const data = await response.json();
+      const responseData = await response.json();
 
+      // Tambahkan pesan bot
       const botMessage = {
         sender: "bot",
         text: response.ok
-          ? `Menemukan ${data.recommendations?.length} resep`
+          ? `Menemukan ${responseData.recommendations?.length} resep`
           : "Error",
-        data: response.ok ? data : null,
+        data: response.ok ? responseData : null,
+        requestParams: requestBody, // Simpan parameter awal
+        pagination: response.ok ? responseData.pagination : null,
       };
 
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       setMessages((prev) => [
         ...prev,
-        {
-          sender: "bot",
-          text: "Koneksi ke server gagal",
-        },
+        { sender: "bot", text: "Koneksi ke server gagal" },
       ]);
     }
   };
 
-  const retryLastRequest = async () => {
-    if (!Object.keys(lastRequestParams).length) return;
+  // Fungsi untuk memuat lebih banyak resep
+  const loadMoreRecipes = async (messageIndex) => {
+    const targetMessage = messages[messageIndex];
+
+    // Validasi
+    if (
+      !targetMessage?.pagination ||
+      targetMessage.pagination.current_page + 1 >=
+        targetMessage.pagination.total_pages
+    ) {
+      return;
+    }
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/recommend", {
+      // Hitung halaman berikutnya
+      const nextPage = targetMessage.pagination.current_page + 1;
+
+      // Kirim request dengan parameter yang sama
+      const response = await fetch("http://localhost:5000/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...lastRequestParams, top_n: 5 }),
+        body: JSON.stringify({
+          ...targetMessage.requestParams,
+          page: nextPage,
+          top_n: 5,
+        }),
       });
 
-      const data = await response.json();
+      const newData = await response.json();
 
-      const botMessage = {
-        sender: "bot",
-        text: response.ok
-          ? `Menemukan ${data.recommendations?.length} resep baru`
-          : "Error",
-        data: response.ok ? data : null,
-      };
-
-      setMessages((prev) => [...prev, botMessage]);
+      // Update pesan yang spesifik
+      setMessages((prev) =>
+        prev.map((msg, idx) => {
+          if (idx === messageIndex) {
+            return {
+              ...msg,
+              data: {
+                ...newData,
+                recommendations: [
+                  ...(msg.data?.recommendations || []),
+                  ...newData.recommendations,
+                ],
+              },
+              pagination: newData.pagination,
+            };
+          }
+          return msg;
+        })
+      );
     } catch (error) {
       setMessages((prev) => [
         ...prev,
-        {
-          sender: "bot",
-          text: "Koneksi ke server gagal",
-        },
+        { sender: "bot", text: "Gagal memuat resep tambahan" },
       ]);
     }
   };
@@ -106,7 +132,7 @@ function App() {
               messages={messages}
               onSend={sendMessage}
               activeMode={activeMode}
-              onRetry={retryLastRequest}
+              onLoadMore={loadMoreRecipes}
             />
           }
         />
