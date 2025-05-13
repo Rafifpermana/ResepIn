@@ -33,7 +33,7 @@ function App() {
       };
 
       // Kirim request ke backend
-      const response = await fetch("http://localhost:5000/recommend", {
+      const response = await fetch("import.meta.env.VITE_BASE_URL", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...requestBody, top_n: 5 }),
@@ -79,7 +79,7 @@ function App() {
       const nextPage = targetMessage.pagination.current_page + 1;
 
       // Kirim request dengan parameter yang sama
-      const response = await fetch("http://localhost:5000/recommend", {
+      const response = await fetch("import.meta.env.VITE_BASE_URL", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

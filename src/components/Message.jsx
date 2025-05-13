@@ -138,7 +138,7 @@ const Message = ({ sender, text, data, pagination, onLoadMore, index }) => {
                 onClick={() => onLoadMore(index)}
                 className="w-full mt-4 py-2 px-4 bg-orange-100 hover:bg-orange-200 text-orange-600 rounded-full transition-colors flex items-center justify-center gap-2"
               >
-                <span>Tampilkan Resep Lainnya (Halaman {currentPage + 1})</span>
+                <span>Tampilkan Resep Lainnya (Halaman {currentPage + 2})</span>
                 <span className="text-xl">🥘</span>
               </button>
             )}
